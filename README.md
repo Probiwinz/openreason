@@ -208,11 +208,11 @@ Current packs:
 
 | Pack | Capabilities | Draft frameworks | Notes |
 |---|---|---|---|
-| `logic` | argument_analysis, fallacy_detection | Walton, Toulmin, Weston, Damer | 4 draft |
-| `discourse` | discourse_analysis, group_representation_analysis, social_effect_analysis | van Dijk, Fairclough, Wodak | 3 draft |
-| `framing-rhetoric` | framing_analysis, rhetoric_analysis | Entman, Aristotle, Lakoff, Perelman | 4 draft |
-| `psychology` | cognitive_effect_analysis, social_effect_analysis | Kahneman/Tversky, Haidt | 2 draft — all findings C1/H1 |
-| `propaganda` | propaganda_analysis, social_effect_analysis | IPA, Jowett/O'Donnell | 2 draft — classification always H1 |
+| `logic` | argument_analysis, fallacy_detection | Douglas Walton, Stephen Toulmin, Anthony Weston, T. Edward Damer | 4 draft |
+| `discourse` | discourse_analysis, group_representation_analysis, social_effect_analysis | Teun A. van Dijk, Norman Fairclough, Ruth Wodak | 3 draft |
+| `framing-rhetoric` | framing_analysis, rhetoric_analysis | Robert Entman, Aristotle, George Lakoff, Chaïm Perelman and Lucie Olbrechts-Tyteca | 4 draft |
+| `psychology` | cognitive_effect_analysis, social_effect_analysis | Daniel Kahneman and Amos Tversky, Jonathan Haidt | 2 draft — all findings C1/H1 |
+| `propaganda` | propaganda_analysis, social_effect_analysis | Institute for Propaganda Analysis, Garth Jowett and Victoria O'Donnell | 2 draft — classification always H1 |
 
 All 15 frameworks are draft — their content has not been formally verified against the original cited sources.
 
