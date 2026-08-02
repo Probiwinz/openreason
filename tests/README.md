@@ -41,6 +41,7 @@ npm run cc:health
 | `router.test.ts` | Intent detection for various prompt patterns |
 | `compiler.test.ts` | Instruction compilation smoke tests |
 | `engine.test.ts` | `ReasoningEngine.analyze()` output shape and content |
+| `segmenter.test.ts` | Deterministic plaintext/Markdown segmentation, stable IDs, heading context, and exact offsets |
 
 ---
 
@@ -106,6 +107,13 @@ npm run cc:health
 - `ReasoningEngine.analyze()` returns correct plan structure
 - Plan contains expected fields: input, frameworks, evidenceModel, intent, instructions
 - Report scaffold contains all required section headings
+
+### `segmenter.test.ts`
+- Plaintext is split at blank lines without losing source offsets
+- Markdown headings and fenced code blocks form explicit segments
+- Heading paths are carried into following content
+- Document and segment IDs are stable for identical input
+- Every segment maps back exactly to its source text
 
 ---
 

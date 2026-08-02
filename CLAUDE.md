@@ -248,6 +248,7 @@ src/                       ← TypeScript reference implementation
   resolver.ts              ← framework selection
   compiler.ts              ← instruction compilation
   engine.ts                ← legacy analysis packet generator (CLI `analyze` command)
+  segmenter.ts             ← deterministic plaintext/Markdown segmentation
   schema.ts                ← types and Zod schemas
   openreason/              ← ReasoningEngine public API layer
     index.ts               ← ReasoningEngine class

@@ -8,6 +8,8 @@ import { resolveFrameworks } from './resolver.js';
 import { compileInstructions } from './compiler.js';
 import { createAnalysisPacket, writeAnalysisPacket } from './engine.js';
 import { ReasoningEngine } from './openreason/index.js';
+import { createDocument, segmentDocument } from './segmenter.js';
+import type { DocumentFormat } from './schema.js';
 
 const program = new Command();
 program.name('openreason').description('Transparent reasoning framework reference implementation').version('0.1.0');
@@ -58,6 +60,33 @@ program.command('inspect').argument('<input>', 'input markdown/text file').descr
   const resolution = resolveFrameworks(intent, frameworks, input);
   console.log(JSON.stringify({ intent, frameworks: resolution.activatedFrameworks.map((f) => f.id) }, null, 2));
 });
+
+program.command('segment')
+  .argument('<input>', 'input markdown/text file')
+  .option('--format <format>', 'input format: plaintext or markdown')
+  .option('--out <file>', 'write JSON to a file instead of stdout')
+  .description('Deterministically split a plain-text or Markdown document into traceable segments')
+  .action((inputPath, options: { format?: string; out?: string }) => {
+    if (options.format && options.format !== 'plaintext' && options.format !== 'markdown') {
+      throw new Error(`Unsupported format "${options.format}". Use plaintext or markdown.`);
+    }
+
+    const content = fs.readFileSync(inputPath, 'utf8');
+    const document = createDocument(content, {
+      sourcePath: inputPath,
+      format: options.format as DocumentFormat | undefined,
+    });
+    const output = JSON.stringify({ document, segments: segmentDocument(document) }, null, 2);
+
+    if (options.out) {
+      fs.mkdirSync(path.dirname(options.out), { recursive: true });
+      fs.writeFileSync(options.out, output, 'utf8');
+      console.log(`Wrote ${options.out}`);
+      return;
+    }
+
+    console.log(output);
+  });
 
 program.command('compile').argument('<input>', 'input markdown/text file').option('--out <file>', 'output file', 'compiled_prompt.md').description('Compile selected frameworks into OpenReason instructions').action((inputPath, options) => {
   const input = fs.readFileSync(inputPath, 'utf8');

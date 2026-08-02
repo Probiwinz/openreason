@@ -47,6 +47,29 @@ export type ResolutionResult = {
   skippedFrameworks: { id: string; reason: string }[];
 };
 
+export type DocumentFormat = 'plaintext' | 'markdown';
+
+export type Document = {
+  id: string;
+  content: string;
+  format: DocumentFormat;
+  title?: string;
+  sourcePath?: string;
+};
+
+export type SegmentKind = 'heading' | 'paragraph' | 'code';
+
+export type Segment = {
+  id: string;
+  documentId: string;
+  index: number;
+  kind: SegmentKind;
+  headingPath: string[];
+  text: string;
+  startOffset: number;
+  endOffset: number;
+};
+
 export const MaturityLevelSchema = z.enum(['implemented', 'draft', 'planned', 'reference']);
 export type MaturityLevel = z.infer<typeof MaturityLevelSchema>;
 

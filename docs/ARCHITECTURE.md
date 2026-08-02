@@ -132,7 +132,14 @@ They are also called directly by the CLI for backward compatibility.
 | `src/resolver.ts` | Score frameworks against intent and input signals; select the best set |
 | `src/compiler.ts` | Assemble framework content into analysis instructions (internal detail) |
 | `src/engine.ts` | Deterministic Markdown packet for the CLI `analyze` command |
-| `src/cli.ts` | Expose pipeline as CLI commands (validate, inspect, compile, analyze) |
+| `src/segmenter.ts` | Provider-independent plaintext/Markdown segmentation with stable IDs and source offsets |
+| `src/cli.ts` | Expose pipeline as CLI commands (validate, inspect, segment, compile, analyze) |
+
+### Deterministic document segmentation
+
+`createDocument()` and `segmentDocument()` are an optional preparation layer before analysis. They do not call a model and do not change the existing intent-routing pipeline. Plaintext is split at blank lines. Markdown additionally creates explicit heading and fenced-code segments while retaining the active heading path.
+
+Every segment has a stable ID and exclusive `startOffset`/`endOffset` values. This guarantees that `document.content.slice(startOffset, endOffset)` is exactly equal to the stored segment text, so later processing can always trace a result back to the original document.
 
 ### Full pipeline
 
@@ -165,6 +172,7 @@ engine.analyze(input)
 |---|---|
 | `npm run validate` | Validate all YAML framework files against the schema |
 | `npx tsx src/cli.ts inspect <file>` | Print the detected intent and selected frameworks as JSON |
+| `npx tsx src/cli.ts segment <file>` | Print deterministic document and segment JSON with stable IDs and offsets |
 | `npx tsx src/cli.ts compile <file>` | Write compiled analysis instructions to a file |
 | `npx tsx src/cli.ts analyze <file> --out reports/<name>.md` | Generate a full analysis packet |
 | `npm run cc:smoke` | Full health check: validate → test → build → analyze |
