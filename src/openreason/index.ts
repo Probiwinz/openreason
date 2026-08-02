@@ -118,4 +118,7 @@ export class ReasoningEngine {
 
 export { buildAnalysisPlan } from './planner.js';
 export { EVIDENCE_MODEL, EVIDENCE_LABELS, isValidEvidenceStatus, getEvidenceEntry } from './evidence.js';
+export { createDocument, segmentDocument } from '../segmenter.js';
 export type { EvidenceStatusEntry } from './evidence.js';
+export type { CreateDocumentOptions } from '../segmenter.js';
+export type { Document, DocumentFormat, Segment, SegmentKind } from '../schema.js';
