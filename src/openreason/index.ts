@@ -129,6 +129,14 @@ export {
 } from '../claim-schema.js';
 export { gateReaderOutput } from '../claim-gate.js';
 export {
+  ClaimRevisionSchema,
+  ClaimVerificationIssueSchema,
+  ClaimVerificationOutputSchema,
+  gateClaimVerification,
+  MockClaimVerifierAgent,
+  runClaimVerifier,
+} from '../claim-verifier.js';
+export {
   buildCodexEnvironment,
   buildCodexReaderPrompt,
   CodexSubagentReaderAgent,
@@ -136,6 +144,10 @@ export {
   resolveCodexReaderOutput,
   runCodexCommand,
 } from '../codex-subagent-reader.js';
+export {
+  buildCodexClaimVerifierPrompt,
+  CodexSubagentClaimVerifierAgent,
+} from '../codex-subagent-claim-verifier.js';
 export { MockReaderAgent, ReaderAbortError, runReaderAgent } from '../reader-agent.js';
 export type { EvidenceStatusEntry } from './evidence.js';
 export type { CreateDocumentOptions } from '../segmenter.js';
@@ -155,12 +167,29 @@ export type {
   RejectedClaim,
 } from '../claim-gate.js';
 export type {
+  ClaimRevision,
+  ClaimVerificationIssue,
+  ClaimVerificationOutput,
+  ClaimVerificationRecord,
+  ClaimVerifierAgent,
+  ClaimVerifierExecutionError,
+  ClaimVerifierOutputError,
+  ClaimVerifierOutputErrorCode,
+  ClaimVerifierRequest,
+  ClaimVerifierRunResult,
+  GatedClaimVerification,
+  MockClaimVerifierHandler,
+} from '../claim-verifier.js';
+export type {
   CodexCommandInvocation,
   CodexCommandResult,
   CodexCommandRunner,
   CodexSubagentReaderOptions,
   CodexSubagentVerifier,
 } from '../codex-subagent-reader.js';
+export type {
+  CodexSubagentClaimVerifierOptions,
+} from '../codex-subagent-claim-verifier.js';
 export type {
   MockReaderHandler,
   ReaderAgent,
