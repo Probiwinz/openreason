@@ -10,7 +10,9 @@ import { createAnalysisPacket, writeAnalysisPacket } from './engine.js';
 import { ReasoningEngine } from './openreason/index.js';
 import { createDocument, segmentDocument } from './segmenter.js';
 import { CodexSubagentReaderAgent } from './codex-subagent-reader.js';
+import { CodexSubagentClaimVerifierAgent } from './codex-subagent-claim-verifier.js';
 import { ReaderAbortError, runReaderAgent } from './reader-agent.js';
+import { ClaimVerifierAbortError, runClaimVerifier } from './claim-verifier.js';
 import type { DocumentFormat } from './schema.js';
 
 const program = new Command();
@@ -96,14 +98,16 @@ program.command('read')
   .option('--out <file>', 'write the complete reader result to a JSON file')
   .option('--codex-bin <path>', 'Codex executable (or set OPENREASON_CODEX_BIN)')
   .option('--model <id>', 'optional Codex model override')
-  .option('--timeout-ms <milliseconds>', 'timeout per segment', '120000')
-  .description('Extract claims with a Codex reader subagent and validate them with the hardcoded gate')
+  .option('--timeout-ms <milliseconds>', 'timeout per reader or verifier call', '120000')
+  .option('--verify', 'semantically verify every gated reader claim')
+  .description('Extract gated claims with Codex and optionally verify their semantic faithfulness')
   .action(async (inputPath, options: {
     format?: string;
     out?: string;
     codexBin?: string;
     model?: string;
     timeoutMs: string;
+    verify?: boolean;
   }) => {
     if (options.format && options.format !== 'plaintext' && options.format !== 'markdown') {
       throw new Error(`Unsupported format "${options.format}". Use plaintext or markdown.`);
@@ -133,7 +137,27 @@ program.command('read')
         signal: controller.signal,
       });
       const result = await runReaderAgent(document, segments, reader);
-      const output = JSON.stringify({ document, segments, result }, null, 2);
+
+      const verification = options.verify
+        ? await runClaimVerifier(
+          result.accepted,
+          segments,
+          new CodexSubagentClaimVerifierAgent({
+            cwd: process.cwd(),
+            codexExecutable: options.codexBin,
+            model: options.model,
+            timeoutMs,
+            signal: controller.signal,
+          }),
+        )
+        : undefined;
+
+      const output = JSON.stringify({
+        document,
+        segments,
+        result,
+        ...(verification ? { verification } : {}),
+      }, null, 2);
 
       if (options.out) {
         fs.mkdirSync(path.dirname(options.out), { recursive: true });
@@ -143,12 +167,19 @@ program.command('read')
         console.log(output);
       }
 
-      if (result.executionErrors.length > 0 || result.outputErrors.length > 0) {
+      if (
+        result.executionErrors.length > 0
+        || result.outputErrors.length > 0
+        || (verification && (
+          verification.executionErrors.length > 0
+          || verification.outputErrors.length > 0
+        ))
+      ) {
         process.exitCode = 2;
       }
     } catch (error) {
-      if (error instanceof ReaderAbortError) {
-        console.error('OpenReason reader cancelled.');
+      if (error instanceof ReaderAbortError || error instanceof ClaimVerifierAbortError) {
+        console.error('OpenReason reader/verifier cancelled.');
         process.exitCode = 130;
         return;
       }
