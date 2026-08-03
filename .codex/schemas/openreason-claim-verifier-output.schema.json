@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "claimId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["accepted", "rewrite", "rejected"]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "UNFAITHFUL_PARAPHRASE",
+          "UNSUPPORTED_DETAIL",
+          "LOST_QUALIFIER",
+          "NEGATION_ERROR",
+          "STANCE_MISMATCH",
+          "SPEAKER_MISMATCH",
+          "CLAIM_TYPE_MISMATCH",
+          "NON_ATOMIC",
+          "CONTEXT_INSUFFICIENT",
+          "OTHER"
+        ]
+      }
+    },
+    "rationale": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revisions": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "claim": { "type": "string", "minLength": 1 },
+          "claimType": {
+            "type": "string",
+            "enum": [
+              "empirical",
+              "causal",
+              "normative",
+              "evaluative",
+              "predictive",
+              "definitional",
+              "interpretive"
+            ]
+          },
+          "speaker": { "type": ["string", "null"] },
+          "stance": {
+            "type": "string",
+            "enum": [
+              "asserted",
+              "denied",
+              "questioned",
+              "quoted",
+              "hypothetical",
+              "uncertain"
+            ]
+          },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "requiresExternalVerification": { "type": "boolean" }
+        },
+        "required": [
+          "claim",
+          "claimType",
+          "speaker",
+          "stance",
+          "confidence",
+          "requiresExternalVerification"
+        ]
+      }
+    }
+  },
+  "required": ["claimId", "decision", "issues", "rationale", "revisions"]
+}
