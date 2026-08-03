@@ -35,6 +35,13 @@ The framework does not automatically classify any communication as propaganda. I
 - `propaganda_analysis` — definitional assessment and ten-step systematic analysis
 - `social_effect_analysis` — assessment of effects and audience responses
 
+## Workflow summary
+
+1. Establish the communication's source, historical context, ideology, institutional setting, and target audience.
+2. Work through all ten analysis steps, keeping direct observations separate from discourse, framing, effect, and intent inferences.
+3. Use IPA or a rhetoric framework for the detailed technique analysis required in steps 6–7.
+4. Classify the communication as propaganda only as an `H1` hypothesis, and state which contextual evidence is missing.
+
 ## The definition of propaganda
 
 Jowett and O'Donnell define propaganda as:

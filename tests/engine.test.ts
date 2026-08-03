@@ -46,6 +46,8 @@ describe('ReasoningEngine.analyze', () => {
 
   it('reportScaffold includes framework analysis questions', () => {
     const result = engine.analyze('Why are Iranians used as a contrast group against Somalis?');
-    expect(result.reportScaffold).toContain('Who is presented as');
+    const question = result.plan.frameworks.flatMap(f => f.analysis_questions)[0];
+    expect(question).toBeDefined();
+    expect(result.reportScaffold).toContain(question!);
   });
 });

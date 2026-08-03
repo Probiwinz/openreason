@@ -190,9 +190,10 @@ describe('Discourse framework differentiation', () => {
   });
 
   it('all three frameworks have distinct triggers', () => {
-    const triggerSets = discourseFrameworks.map(f => new Set(f.triggers));
     // Fairclough and Wodak should have triggers van-dijk does not
-    const vdTriggers = triggerSets[0];
+    const vdTriggers = new Set(
+      discourseFrameworks.find(f => f.id === 'discourse-van-dijk')!.triggers
+    );
     const fcTriggers = discourseFrameworks.find(f => f.id === 'discourse-fairclough')!.triggers;
     const fcUnique = fcTriggers.some(t => !vdTriggers.has(t));
     expect(fcUnique, 'Fairclough has no triggers distinct from van-dijk').toBe(true);
