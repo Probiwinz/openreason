@@ -45,6 +45,10 @@ npm run cc:health
 | `claim-gate.test.ts` | Strict claim schema, exact evidence grounding, segment isolation, deterministic IDs, and partial rejection |
 | `reader-agent.test.ts` | One-call-per-segment orchestration, mock reader, isolation, and recoverable reader failures |
 | `codex-subagent-reader.test.ts` | Codex delegation contract, quote-to-offset grounding, safe process failures, and gate integration |
+| `claim-verifier.test.ts` | Semantic accept/rewrite/reject decisions, stable rewritten IDs, unchanged evidence, and per-claim isolation |
+| `codex-subagent-claim-verifier.test.ts` | Read-only Codex semantic-verifier delegation and failure isolation |
+| `claim-reconciler.test.ts` | Document-wide relationships, clusters, unresolved conflicts, audit records, stable IDs, and immutable provenance |
+| `codex-subagent-claim-reconciler.test.ts` | Read-only schema-constrained reconciliation delegation and safe failures |
 
 ---
 

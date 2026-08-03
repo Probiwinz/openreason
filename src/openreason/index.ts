@@ -148,6 +148,18 @@ export {
   buildCodexClaimVerifierPrompt,
   CodexSubagentClaimVerifierAgent,
 } from '../codex-subagent-claim-verifier.js';
+export {
+  ClaimRelationshipDecisionSchema,
+  ClaimRelationshipTypeSchema,
+  DocumentClaimReconcilerOutputSchema,
+  gateDocumentClaimReconciliation,
+  MockDocumentClaimReconcilerAgent,
+  runDocumentClaimReconciler,
+} from '../claim-reconciler.js';
+export {
+  buildCodexClaimReconcilerPrompt,
+  CodexSubagentClaimReconcilerAgent,
+} from '../codex-subagent-claim-reconciler.js';
 export { MockReaderAgent, ReaderAbortError, runReaderAgent } from '../reader-agent.js';
 export type { EvidenceStatusEntry } from './evidence.js';
 export type { CreateDocumentOptions } from '../segmenter.js';
@@ -190,6 +202,24 @@ export type {
 export type {
   CodexSubagentClaimVerifierOptions,
 } from '../codex-subagent-claim-verifier.js';
+export type {
+  ClaimRelationshipDecision,
+  ClaimRelationshipType,
+  DocumentClaimAuditRecord,
+  DocumentClaimCluster,
+  DocumentClaimLedger,
+  DocumentClaimReconcilerAgent,
+  DocumentClaimReconcilerRequest,
+  DocumentClaimRelationship,
+  MockDocumentClaimReconcilerHandler,
+  ReconcilerExecutionError,
+  ReconcilerOutputError,
+  ReconcilerOutputErrorCode,
+  UnresolvedClaimConflict,
+} from '../claim-reconciler.js';
+export type {
+  CodexSubagentClaimReconcilerOptions,
+} from '../codex-subagent-claim-reconciler.js';
 export type {
   MockReaderHandler,
   ReaderAgent,
