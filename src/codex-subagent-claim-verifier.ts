@@ -8,6 +8,7 @@ import {
 import {
   createCodexSessionVerifier,
   runCodexCommand,
+  type CodexCommandResult,
   type CodexCommandRunner,
   type CodexSubagentVerifier,
 } from './codex-subagent-reader.js';
@@ -122,7 +123,7 @@ export class CodexSubagentClaimVerifierAgent implements ClaimVerifierAgent {
   }
 
   async verifyClaim(request: ClaimVerifierRequest): Promise<unknown> {
-    let result;
+    let result: CodexCommandResult;
     try {
       result = await this.runner({
         command: this.codexExecutable,
