@@ -29,7 +29,8 @@ Check all of these dimensions:
 - support: do not add details that the segment does not supply
 
 Choose exactly one decision:
-- accepted: the claim is already faithful and atomic; revisions must be null
+- accepted: the claim is already faithful and atomic; issues must be empty and
+  revisions must be null
 - rewrite: the claim is repairable; return one or more complete atomic revisions
 - rejected: the segment does not support a recoverable proposition or lacks the
   context needed to verify it; revisions must be null
