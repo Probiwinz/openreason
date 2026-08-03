@@ -32,6 +32,13 @@ This framework identifies the seven propaganda devices described by the Institut
 - `propaganda_analysis` — identification of the seven recognised propaganda devices
 - `rhetoric_analysis` — the devices overlap substantially with rhetorical analysis (most are forms of appeal)
 
+## Workflow summary
+
+1. Record the exact words and explicit claims that may realise a device (`O1`/`O2`).
+2. Check each candidate against the seven device definitions and label supported interpretations `R1` or `D1`.
+3. Separate device identification from propaganda classification; any claim about intent or classification remains `H1`.
+4. Use Jowett and O'Donnell when institutional context, audience, campaign structure, or systematic intent must be assessed.
+
 ## The seven devices
 
 ### Name Calling
