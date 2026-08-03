@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "segmentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "claim": { "type": "string", "minLength": 1 },
+          "claimType": {
+            "type": "string",
+            "enum": [
+              "empirical",
+              "causal",
+              "normative",
+              "evaluative",
+              "predictive",
+              "definitional",
+              "interpretive"
+            ]
+          },
+          "speaker": { "type": ["string", "null"] },
+          "stance": {
+            "type": "string",
+            "enum": [
+              "asserted",
+              "denied",
+              "questioned",
+              "quoted",
+              "hypothetical",
+              "uncertain"
+            ]
+          },
+          "evidenceText": { "type": "string", "minLength": 1 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "requiresExternalVerification": { "type": "boolean" }
+        },
+        "required": [
+          "claim",
+          "claimType",
+          "speaker",
+          "stance",
+          "evidenceText",
+          "confidence",
+          "requiresExternalVerification"
+        ]
+      }
+    }
+  },
+  "required": ["segmentId", "claims"]
+}

@@ -133,6 +133,10 @@ They are also called directly by the CLI for backward compatibility.
 | `src/compiler.ts` | Assemble framework content into analysis instructions (internal detail) |
 | `src/engine.ts` | Deterministic Markdown packet for the CLI `analyze` command |
 | `src/segmenter.ts` | Provider-independent plaintext/Markdown segmentation with stable IDs and source offsets |
+| `src/claim-schema.ts` | Provider-neutral claim, stance, and evidence contracts for untrusted reader output |
+| `src/claim-gate.ts` | Deterministic validation of evidence bounds, source text, segment ownership, and claim IDs |
+| `src/reader-agent.ts` | Segment-by-segment reader interface, orchestration, and deterministic mock reader |
+| `src/codex-subagent-reader.ts` | Read-only Codex subagent adapter and deterministic evidence-quote resolution |
 | `src/cli.ts` | Expose pipeline as CLI commands (validate, inspect, segment, compile, analyze) |
 
 ### Deterministic document segmentation
@@ -140,6 +144,16 @@ They are also called directly by the CLI for backward compatibility.
 `createDocument()` and `segmentDocument()` are an optional preparation layer before analysis. They do not call a model and do not change the existing intent-routing pipeline. Plaintext is split at blank lines. Markdown additionally creates explicit heading and fenced-code segments while retaining the active heading path.
 
 Every segment has a stable ID and exclusive `startOffset`/`endOffset` values. This guarantees that `document.content.slice(startOffset, endOffset)` is exactly equal to the stored segment text, so later processing can always trace a result back to the original document.
+
+### Reader agent and hardcoded claim gate
+
+The optional reader layer receives exactly one segment per call and returns `unknown`. This boundary is intentional: provider or model output is never trusted just because it has a TypeScript shape. `runReaderAgent()` sends each segment to a `ReaderAgent`, then immediately passes its response through `gateReaderOutput()`.
+
+The deterministic gate checks the output envelope, claim schema, document and segment IDs, end-exclusive evidence bounds, and the exact source slice. Only accepted claims receive a stable gate-generated ID. Invalid candidates are kept as structured rejections, and one malformed candidate does not discard valid neighbours. Reader execution failures are recorded per segment so later segments can still run.
+
+`CodexSubagentReaderAgent` is the first real reader implementation. For every segment it starts a read-only `codex exec` parent that delegates exactly once to the project custom agent `openreason_reader`. The subagent returns a claim plus an exact source quote, while local code resolves a unique quote to document-wide offsets before the existing gate sees it. The process inherits saved Codex authentication but does not pass provider API-key variables into the child. `openreason read <file>` runs the complete document → segmenter → Codex reader → gate path. Codex CLI 0.146 cannot spawn a subagent from an ephemeral parent, so reader runs currently remain in the local Codex thread history.
+
+The hardcoded gate still does not decide whether a claim is semantically faithful, atomic, or true. Claim type, speaker, stance, paraphrase quality, and confidence remain model judgements. A read-only sandbox prevents writes but is not a complete prompt-injection boundary for sensitive local reads. Other providers, local models, environment-variable setup, and integration with `ReasoningEngine` remain separate milestones.
 
 ### Full pipeline
 
@@ -173,6 +187,7 @@ engine.analyze(input)
 | `npm run validate` | Validate all YAML framework files against the schema |
 | `npx tsx src/cli.ts inspect <file>` | Print the detected intent and selected frameworks as JSON |
 | `npx tsx src/cli.ts segment <file>` | Print deterministic document and segment JSON with stable IDs and offsets |
+| `npx tsx src/cli.ts read <file> --out <result.json>` | Run the Codex reader subagent per segment, verify its child thread, and gate all claims |
 | `npx tsx src/cli.ts compile <file>` | Write compiled analysis instructions to a file |
 | `npx tsx src/cli.ts analyze <file> --out reports/<name>.md` | Generate a full analysis packet |
 | `npm run cc:smoke` | Full health check: validate → test → build → analyze |
