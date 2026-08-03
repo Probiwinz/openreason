@@ -74,3 +74,5 @@ npx tsx src/cli.ts read input.md --verify --out reports/claims.json
 ```
 
 The verifier receives the full containing segment for context, while local code preserves the exact evidence span that already passed the hard gate.
+
+Repository-wide validation runs `npm ci`, `npm test`, and `npm run build` before merge.
