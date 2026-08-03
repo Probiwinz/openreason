@@ -45,7 +45,7 @@ export type ClaimRevision = z.infer<typeof ClaimRevisionSchema>;
 const AcceptedVerificationSchema = z.object({
   claimId: z.string().min(1),
   decision: z.literal('accepted'),
-  issues: z.array(ClaimVerificationIssueSchema),
+  issues: z.array(ClaimVerificationIssueSchema).length(0),
   rationale: z.string().trim().min(1),
   revisions: z.null(),
 }).strict();
@@ -126,6 +126,7 @@ export type ClaimVerifierRunResult = {
   records: ClaimVerificationRecord[];
   accepted: Claim[];
   rewritten: Claim[];
+  finalClaims: Claim[];
   rejectedClaimIds: string[];
   outputErrors: ClaimVerifierOutputError[];
   executionErrors: ClaimVerifierExecutionError[];
@@ -252,6 +253,7 @@ export async function runClaimVerifier(
     records: [],
     accepted: [],
     rewritten: [],
+    finalClaims: [],
     rejectedClaimIds: [],
     outputErrors: [],
     executionErrors: [],
@@ -286,8 +288,10 @@ export async function runClaimVerifier(
       result.records.push(gated.record);
       if (gated.record.decision === 'accepted') {
         result.accepted.push(...gated.finalClaims);
+        result.finalClaims.push(...gated.finalClaims);
       } else if (gated.record.decision === 'rewrite') {
         result.rewritten.push(...gated.finalClaims);
+        result.finalClaims.push(...gated.finalClaims);
       } else {
         result.rejectedClaimIds.push(claim.id);
       }
