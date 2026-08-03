@@ -14,6 +14,8 @@ This example demonstrates how the four frameworks in the Framing and Rhetoric Pa
 
 This type of statement appears in political speeches, budget debates, and welfare policy discussions. The speaker is unspecified. The statement addresses welfare and social support policy.
 
+Evidence labels used below: `[F1]` marks framing interpretations, `[R1]` marks rhetorical interpretations, and `[H1]` is reserved for unverified hypotheses about speaker intent. This example does not infer intent; any such inference would require an explicit `[H1]` label.
+
 ## What each framework contributes
 
 ### Entman — structural framing (what the frame says)

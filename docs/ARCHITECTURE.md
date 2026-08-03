@@ -137,6 +137,10 @@ They are also called directly by the CLI for backward compatibility.
 | `src/claim-gate.ts` | Deterministic validation of evidence bounds, source text, segment ownership, and claim IDs |
 | `src/reader-agent.ts` | Segment-by-segment reader interface, orchestration, and deterministic mock reader |
 | `src/codex-subagent-reader.ts` | Read-only Codex subagent adapter and deterministic evidence-quote resolution |
+| `src/claim-verifier.ts` | Provider-neutral semantic verification, local output gate, stable rewrites, and per-claim isolation |
+| `src/codex-subagent-claim-verifier.ts` | Read-only Codex adapter for semantic verification |
+| `src/claim-reconciler.ts` | Document-wide relationship gate and canonical `DocumentClaimLedger` construction |
+| `src/codex-subagent-claim-reconciler.ts` | Read-only, schema-constrained Codex reconciliation adapter |
 | `src/cli.ts` | Expose pipeline as CLI commands (validate, inspect, segment, compile, analyze) |
 
 ### Deterministic document segmentation
@@ -153,7 +157,15 @@ The deterministic gate checks the output envelope, claim schema, document and se
 
 `CodexSubagentReaderAgent` is the first real reader implementation. For every segment it starts a read-only `codex exec` parent that delegates exactly once to the project custom agent `openreason_reader`. The subagent returns a claim plus an exact source quote, while local code resolves a unique quote to document-wide offsets before the existing gate sees it. The process inherits saved Codex authentication but does not pass provider API-key variables into the child. `openreason read <file>` runs the complete document → segmenter → Codex reader → gate path. Codex CLI 0.146 cannot spawn a subagent from an ephemeral parent, so reader runs currently remain in the local Codex thread history.
 
-The hardcoded gate still does not decide whether a claim is semantically faithful, atomic, or true. Claim type, speaker, stance, paraphrase quality, and confidence remain model judgements. A read-only sandbox prevents writes but is not a complete prompt-injection boundary for sensitive local reads. Other providers, local models, environment-variable setup, and integration with `ReasoningEngine` remain separate milestones.
+The hard gate deliberately does not decide whether a claim is semantically faithful, atomic, or true. The optional semantic verifier handles faithfulness and atomicity against the supplied segment, with every response gated locally and every rewrite constructed locally while retaining the original evidence span. It still does not decide external truth.
+
+### Document claim ledger and reconciliation
+
+The optional reconciler receives the semantic verifier's complete `finalClaims` list. Its provider-neutral agent returns `unknown`; a local envelope schema and strict per-decision gate accept only known claim IDs and the relationship vocabulary `duplicate`, `supports`, `contradicts`, `qualifies`, `same_topic`, `different_time`, `different_speaker`, and `unresolved`.
+
+Local code builds a canonical `DocumentClaimLedger` containing all original final claims, validated relationships, deterministic clusters, unresolved conflicts, and audit records. Even duplicate claims remain separate objects with their original IDs and evidence spans. Contradictions are never silently merged or resolved, and speaker/time context never becomes an external truth decision. See `docs/DOCUMENT_CLAIM_RECONCILIATION.md` for the complete contract and progressive-disclosure model.
+
+The Codex adapters use read-only sandboxes, but read-only execution is not by itself a complete prompt-injection boundary for sensitive local reads. Other providers, local models, external fact-checking, and integration with `ReasoningEngine` remain separate milestones.
 
 ### Full pipeline
 
@@ -188,6 +200,8 @@ engine.analyze(input)
 | `npx tsx src/cli.ts inspect <file>` | Print the detected intent and selected frameworks as JSON |
 | `npx tsx src/cli.ts segment <file>` | Print deterministic document and segment JSON with stable IDs and offsets |
 | `npx tsx src/cli.ts read <file> --out <result.json>` | Run the Codex reader subagent per segment, verify its child thread, and gate all claims |
+| `npx tsx src/cli.ts read <file> --verify --out <result.json>` | Add semantic verification and `finalClaims` |
+| `npx tsx src/cli.ts read <file> --reconcile --out <result.json>` | Add semantic verification and an optional document-wide claim ledger |
 | `npx tsx src/cli.ts compile <file>` | Write compiled analysis instructions to a file |
 | `npx tsx src/cli.ts analyze <file> --out reports/<name>.md` | Generate a full analysis packet |
 | `npm run cc:smoke` | Full health check: validate → test → build → analyze |

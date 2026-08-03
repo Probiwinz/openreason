@@ -11,8 +11,13 @@ import { ReasoningEngine } from './openreason/index.js';
 import { createDocument, segmentDocument } from './segmenter.js';
 import { CodexSubagentReaderAgent } from './codex-subagent-reader.js';
 import { CodexSubagentClaimVerifierAgent } from './codex-subagent-claim-verifier.js';
+import { CodexSubagentClaimReconcilerAgent } from './codex-subagent-claim-reconciler.js';
 import { ReaderAbortError, runReaderAgent } from './reader-agent.js';
 import { ClaimVerifierAbortError, runClaimVerifier } from './claim-verifier.js';
+import {
+  DocumentClaimReconcilerAbortError,
+  runDocumentClaimReconciler,
+} from './claim-reconciler.js';
 import type { DocumentFormat } from './schema.js';
 
 const program = new Command();
@@ -98,9 +103,10 @@ program.command('read')
   .option('--out <file>', 'write the complete reader result to a JSON file')
   .option('--codex-bin <path>', 'Codex executable (or set OPENREASON_CODEX_BIN)')
   .option('--model <id>', 'optional Codex model override')
-  .option('--timeout-ms <milliseconds>', 'timeout per reader or verifier call', '120000')
+  .option('--timeout-ms <milliseconds>', 'timeout per reader, verifier, or reconciler call', '120000')
   .option('--verify', 'semantically verify every gated reader claim')
-  .description('Extract gated claims with Codex and optionally verify their semantic faithfulness')
+  .option('--reconcile', 'create a document claim ledger after semantic verification')
+  .description('Extract gated claims and optionally verify and reconcile them with Codex')
   .action(async (inputPath, options: {
     format?: string;
     out?: string;
@@ -108,6 +114,7 @@ program.command('read')
     model?: string;
     timeoutMs: string;
     verify?: boolean;
+    reconcile?: boolean;
   }) => {
     if (options.format && options.format !== 'plaintext' && options.format !== 'markdown') {
       throw new Error(`Unsupported format "${options.format}". Use plaintext or markdown.`);
@@ -138,11 +145,25 @@ program.command('read')
       });
       const result = await runReaderAgent(document, segments, reader);
 
-      const verification = options.verify
+      const verification = options.verify || options.reconcile
         ? await runClaimVerifier(
           result.accepted,
           segments,
           new CodexSubagentClaimVerifierAgent({
+            cwd: process.cwd(),
+            codexExecutable: options.codexBin,
+            model: options.model,
+            timeoutMs,
+            signal: controller.signal,
+          }),
+        )
+        : undefined;
+
+      const ledger = options.reconcile && verification
+        ? await runDocumentClaimReconciler(
+          document.id,
+          verification.finalClaims,
+          new CodexSubagentClaimReconcilerAgent({
             cwd: process.cwd(),
             codexExecutable: options.codexBin,
             model: options.model,
@@ -157,6 +178,7 @@ program.command('read')
         segments,
         result,
         ...(verification ? { verification } : {}),
+        ...(ledger ? { ledger } : {}),
       }, null, 2);
 
       if (options.out) {
@@ -174,12 +196,20 @@ program.command('read')
           verification.executionErrors.length > 0
           || verification.outputErrors.length > 0
         ))
+        || (ledger && (
+          ledger.executionErrors.length > 0
+          || ledger.outputErrors.length > 0
+        ))
       ) {
         process.exitCode = 2;
       }
     } catch (error) {
-      if (error instanceof ReaderAbortError || error instanceof ClaimVerifierAbortError) {
-        console.error('OpenReason reader/verifier cancelled.');
+      if (
+        error instanceof ReaderAbortError
+        || error instanceof ClaimVerifierAbortError
+        || error instanceof DocumentClaimReconcilerAbortError
+      ) {
+        console.error('OpenReason reader/verifier/reconciler cancelled.');
         process.exitCode = 130;
         return;
       }
